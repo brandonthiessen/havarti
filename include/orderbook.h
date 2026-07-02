@@ -1,33 +1,11 @@
 #pragma once
 
+#include "order.h"
+#include "trade.h"
+
 #include <deque>
 #include <map>
 #include <vector>
-
-enum class Side {
-    BUY, SELL
-};
-
-struct Order {
-    int id;
-    Side side;
-    int64_t price;
-    int quantity;
-};
-
-struct BookOrder {
-    Order order;
-    int remaining;
-    BookOrder(const Order& o, int r)
-        : order(o), remaining(r) {}
-};
-
-struct Trade {
-    int buy_order_id;
-    int sell_order_id;
-    int64_t price;
-    int quantity;
-};
 
 class OrderBook {
     public:
