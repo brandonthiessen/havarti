@@ -10,7 +10,7 @@ enum class Side {
 struct Order {
     int id;
     Side side;
-    double price;
+    int64_t price;
     int quantity;
 };
 
@@ -24,9 +24,9 @@ struct BookOrder {
 struct Trade {
     int buy_order_id;
     int sell_order_id;
-    double price;
+    int64_t price;
     int quantity;
-    Trade(const int b, const int s, const double p, const int q)
+    Trade(const int b, const int s, const int64_t p, const int q)
         : buy_order_id(b), sell_order_id(s), price(p), quantity(q) {}
 };
 
@@ -35,8 +35,8 @@ class OrderBook {
         std::vector<Trade> add_order(const Order& incoming);
     private:
         // Ordered by price (high-low)
-        std::map<double, std::deque<BookOrder>, std::greater<double>> buys;
+        std::map<int64_t, std::deque<BookOrder>, std::greater<int64_t>> buys;
 
         // Ordered by price (low-high)
-        std::map<double, std::deque<BookOrder>, std::less<double>> sells;
+        std::map<int64_t, std::deque<BookOrder>, std::less<int64_t>> sells;
 };
