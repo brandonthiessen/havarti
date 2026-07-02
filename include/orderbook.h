@@ -1,6 +1,7 @@
 #pragma once
 
-#include <vector>
+#include <map>
+#include <deque>
 
 enum class Side {
     BUY, SELL
@@ -13,17 +14,29 @@ struct Order {
     int quantity;
 };
 
+struct BookOrder {
+    Order order;
+    int remaining;
+    BookOrder(const Order& o, int r)
+        : order(o), remaining(r) {}
+};
+
 struct Trade {
     int buy_order_id;
     int sell_order_id;
     double price;
     int quantity;
+    Trade(const int b, const int s, const double p, const int q)
+        : buy_order_id(b), sell_order_id(s), price(p), quantity(q) {}
 };
 
 class OrderBook {
     public:
-        std::vector<Trade> add_order(const Order& order);
+        std::vector<Trade> add_order(const Order& incoming);
     private:
-        std::vector<Order> buys;
-        std::vector<Order> sells;
+        // Ordered by price (high-low)
+        std::map<double, std::deque<BookOrder>, std::greater<double>> buys;
+
+        // Ordered by price (low-high)
+        std::map<double, std::deque<BookOrder>, std::less<double>> sells;
 };
