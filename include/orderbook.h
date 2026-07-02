@@ -26,8 +26,6 @@ struct Trade {
     int sell_order_id;
     int64_t price;
     int quantity;
-    Trade(const int b, const int s, const int64_t p, const int q)
-        : buy_order_id(b), sell_order_id(s), price(p), quantity(q) {}
 };
 
 class OrderBook {
