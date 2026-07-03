@@ -8,10 +8,16 @@ add_library(orderbook
     src/orderbook.cpp
 )
 
+add_library(order_generator
+    src/order_generator.cpp
+)
+
 target_include_directories(orderbook PUBLIC include)
+
+target_include_directories(order_generator PUBLIC include)
 
 add_executable(app
     src/main.cpp
 )
 
-target_link_libraries(app orderbook)
+target_link_libraries(app orderbook order_generator)
