@@ -1,6 +1,5 @@
 #include "bench.h"
 
-#include <chrono>
 #include <iostream>
 #include <numeric>
 #include <vector>
@@ -25,7 +24,7 @@ compute_bench_result(const BenchData& d)
 
     auto pct_idx = [](int n, int p) -> size_t { return static_cast<size_t>(std::floor((p / 100.0) * (n + 1))); };
 
-    if (d.start_ts != std::chrono::time_point<std::chrono::high_resolution_clock>{}) {
+    if (d.start_ts != bench::TimePoint{}) {
         r.has_duration = true;
         r.duration = d.end_ts - d.start_ts;
     }
@@ -86,12 +85,12 @@ output_bench_result(const BenchResult& r, std::string name)
 
         std::cout << std::format(
                 "Duration: {:.6f}s ({}ns)\n",
-                std::chrono::duration<double>(r.duration).count(),
+                bench::to_seconds(r.duration),
                 r.duration.count());
 
         std::cout << std::format(
                 "Throughput: {:.2f} orders/sec\n",
-                r.num_orders / std::chrono::duration<double>(r.duration).count());
+                r.num_orders / bench::to_seconds(r.duration));
     }
 
     if (r.has_latency) {

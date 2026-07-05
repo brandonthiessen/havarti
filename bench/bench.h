@@ -6,6 +6,22 @@
 #include <cstdint>
 #include <vector>
 #include <functional>
+#include <string>
+
+namespace bench {
+    using Clock = std::chrono::high_resolution_clock;
+    using TimePoint = Clock::time_point;
+
+    inline TimePoint now() { return Clock::now(); }
+
+    inline std::chrono::nanoseconds diff(TimePoint start, TimePoint end) {
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    }
+
+    inline double to_seconds(std::chrono::nanoseconds ns) {
+        return std::chrono::duration<double>(ns).count();
+    }
+} // namespace bench
 
 struct BenchResult {
     size_t num_orders = 0;
@@ -31,8 +47,8 @@ struct BenchData {
     std::vector<uint64_t> latencies_ns;
     std::vector<std::vector<Trade>> trades;
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> start_ts{};
-    std::chrono::time_point<std::chrono::high_resolution_clock> end_ts{};
+    bench::TimePoint start_ts{};
+    bench::TimePoint end_ts{};
 };
 
 void run_bench(std::string name, std::function<BenchData()> f);
