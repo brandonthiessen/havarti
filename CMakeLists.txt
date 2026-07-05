@@ -15,7 +15,7 @@ add_library(havarti_bench
     bench/bench.cpp
 )
 
-target_include_directories(havarti_bench PUBLIC bench)
+target_include_directories(havarti_bench PUBLIC bench include)
 
 target_link_libraries(havarti_bench PUBLIC havarti_core)
 
