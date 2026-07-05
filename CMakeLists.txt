@@ -19,6 +19,42 @@ target_include_directories(havarti_bench PUBLIC bench include)
 
 target_link_libraries(havarti_bench PUBLIC havarti_core)
 
+add_executable(bench_throughput
+    bench/bench_throughput.cpp
+)
+
+target_link_libraries(bench_throughput
+    havarti_bench
+    havarti_core
+)
+
+add_executable(bench_latency
+    bench/bench_latency.cpp
+)
+
+target_link_libraries(bench_latency
+    havarti_bench
+    havarti_core
+)
+
+add_executable(bench_deep_book
+    bench/bench_deep_book.cpp
+)
+
+target_link_libraries(bench_deep_book
+    havarti_bench
+    havarti_core
+)
+
+add_executable(bench_one_sided_pressure
+    bench/bench_one_sided_pressure.cpp
+)
+
+target_link_libraries(bench_one_sided_pressure
+    havarti_bench
+    havarti_core
+)
+
 add_executable(app
     src/main.cpp
 )
