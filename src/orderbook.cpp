@@ -2,11 +2,13 @@
 
 namespace havarti {
 
-std::vector<Trade>
+OrderBook::OrderBook(TradeSink& sink):
+    sink_(sink)
+{}
+
+void
 OrderBook::add_order(const Order& incoming)
 {
-    std::vector<Trade> trades;
-
     int remaining_qty = incoming.quantity;
 
     if (incoming.side == Side::BUY) {
@@ -25,7 +27,10 @@ OrderBook::add_order(const Order& incoming)
                 auto& resting = resting_queue.front();
 
                 int filled_qty = std::min(remaining_qty, resting.remaining);
-                trades.push_back(Trade(incoming.id, resting.order.id, resting_price, filled_qty));
+                if (!sink_.submit(Trade(incoming.id, resting.order.id, resting_price, filled_qty))) {
+                    // TODO: handle failure
+                }
+
                 remaining_qty -= filled_qty;
                 resting.remaining -= filled_qty;
 
@@ -63,7 +68,9 @@ OrderBook::add_order(const Order& incoming)
                 auto& resting = resting_queue.front();
 
                 int filled_qty = std::min(remaining_qty, resting.remaining);
-                trades.push_back(Trade(resting.order.id, incoming.id, resting_price, filled_qty));
+                if (!sink_.submit(Trade(resting.order.id, incoming.id, resting_price, filled_qty))) {
+                    // TODO: handle failure
+                }
                 remaining_qty -= filled_qty;
                 resting.remaining -= filled_qty;
 
@@ -86,8 +93,6 @@ OrderBook::add_order(const Order& incoming)
             sells[incoming.price].push_back(BookOrder(incoming, remaining_qty));
         }
     }
-
-    return trades;
 }
 
 } // namespace havarti
