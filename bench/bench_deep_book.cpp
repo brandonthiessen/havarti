@@ -1,11 +1,13 @@
 #include "bench.h"
 #include "order_generator.h"
 #include "orderbook.h"
+#include "trade_sink.h"
 
 BenchData bench_deep_book() {
     BenchData d;
 
-    havarti::OrderBook book;
+    havarti::TradeSink sink(8192);
+    havarti::OrderBook book(sink);
     havarti::OrderGenerator gen{42};
 
     // Pre-populate with 100k buy orders

@@ -1,11 +1,13 @@
 #include "bench.h"
 #include "order_generator.h"
 #include "orderbook.h"
+#include "trade_sink.h"
 
 BenchData bench_throughput() {
     BenchData d;
 
-    havarti::OrderBook book;
+    havarti::TradeSink sink(8192);
+    havarti::OrderBook book(sink);
     havarti::OrderGenerator gen{42};
 
     size_t N = 10'000'000;

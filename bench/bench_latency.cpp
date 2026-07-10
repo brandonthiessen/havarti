@@ -5,7 +5,8 @@
 BenchData bench_latency() {
     BenchData d;
 
-    havarti::OrderBook book;
+    havarti::TradeSink sink(8192);
+    havarti::OrderBook book(sink);
     havarti::OrderGenerator gen{42};
 
     size_t N = 1'000'000;
@@ -15,11 +16,12 @@ BenchData bench_latency() {
 
     for (auto& o : orders) {
         auto start = bench::now();
-        auto trades = book.add_order(o);
+
+        // TODO: collect Trade metrics without storing each trade
+        book.add_order(o);
         auto end = bench::now();
 
         d.latencies_ns.push_back(bench::diff(start, end).count());
-        d.trades.push_back(trades);
     }
 
     return d;
