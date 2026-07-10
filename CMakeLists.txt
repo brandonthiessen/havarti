@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(havarti_core
     src/orderbook.cpp
     src/order_generator.cpp
+    src/trade_sink.cpp
 )
 
 target_include_directories(havarti_core PUBLIC include)
