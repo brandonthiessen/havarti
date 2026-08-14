@@ -13,9 +13,11 @@ struct SpscRingBuffer {
     SpscRingBuffer(size_t capacity);
     ~SpscRingBuffer();
 
-    // SPSC ring buffer represents a communication channel and cannot be copied.
+    // SPSC ring buffer represents a communication channel and cannot be copied or moved.
     SpscRingBuffer(const SpscRingBuffer&) = delete;
     SpscRingBuffer& operator=(const SpscRingBuffer&) = delete;
+    SpscRingBuffer(SpscRingBuffer&&) = delete;
+    SpscRingBuffer& operator=(SpscRingBuffer&&) = delete;
 
     bool try_push(const T& value);
     bool try_pop(T& out);
@@ -97,5 +99,6 @@ SpscRingBuffer<T>::empty() const
     size_t head = head_.load(std::memory_order_relaxed);
     return head == tail;
 }
+
 
 } // namespace havarti
