@@ -11,7 +11,7 @@ namespace havarti {
 
 class TradeSink {
     public:
-        TradeSink(const size_t queue_capacity);
+        explicit TradeSink(const size_t queue_capacity);
 
         // TradeSink represents a communication channel and cannot be copied or moved.
         TradeSink(const TradeSink&) = delete;

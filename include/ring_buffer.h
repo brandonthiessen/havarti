@@ -10,7 +10,7 @@ namespace havarti {
 // Note: actual usable number of entries is `capacity - 1`.
 template <typename T>
 struct SpscRingBuffer {
-    SpscRingBuffer(size_t capacity);
+    explicit SpscRingBuffer(size_t capacity);
     ~SpscRingBuffer();
 
     // SPSC ring buffer represents a communication channel and cannot be copied or moved.
