@@ -29,6 +29,7 @@ class PriceLevels {
         static constexpr size_t word_size = sizeof(Price) * 8;
         std::array<std::deque<BookOrder>, dense_size> dense_;
         std::array<uint64_t, dense_size / word_size> occupied_;
+        uint64_t occupied_words_;
         Price dense_min_;
 
         // Maps are indexed by price (ascending)
