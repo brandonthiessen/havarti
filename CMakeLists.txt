@@ -8,6 +8,7 @@ add_library(havarti_core
     src/orderbook.cpp
     src/order_generator.cpp
     src/trade_sink.cpp
+    src/price_levels.cpp
 )
 
 target_include_directories(havarti_core PUBLIC include)
@@ -52,6 +53,15 @@ add_executable(bench_one_sided_pressure
 )
 
 target_link_libraries(bench_one_sided_pressure
+    havarti_bench
+    havarti_core
+)
+
+add_executable(bench_dense_price_levels
+    bench/bench_dense_price_levels.cpp
+)
+
+target_link_libraries(bench_dense_price_levels
     havarti_bench
     havarti_core
 )
