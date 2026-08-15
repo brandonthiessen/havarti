@@ -13,18 +13,16 @@ OrderBook::add_order(const Order& incoming)
 
     if (incoming.side == Side::BUY) {
 
-        // Match incoming buy orders against lowest available sell prices
-        for (auto it = sells.begin(); it != sells.end() && remaining_qty > 0; ) {
-            auto& [resting_price, resting_queue] = *it;
+        Price resting_price;
 
-            // Stop if asks are no longer matchable
-            if (resting_price > incoming.price) {
-                break;
-            }
+        // Match incoming buy orders against lowest available sell prices
+        while (remaining_qty > 0 &&
+               (resting_price = sells_.best_price()) != 0 &&
+               resting_price <= incoming.price) {
 
             // Consume FIFO orders at this price level
-            while (remaining_qty > 0 && !resting_queue.empty()) {
-                auto& resting = resting_queue.front();
+            while (remaining_qty > 0 && !sells_.empty(resting_price)) {
+                BookOrder& resting = sells_.front(resting_price);
 
                 int filled_qty = std::min(remaining_qty, resting.remaining);
                 if (!sink_.submit(Trade(incoming.id, resting.order.id, resting_price, filled_qty))) {
@@ -35,62 +33,47 @@ OrderBook::add_order(const Order& incoming)
                 resting.remaining -= filled_qty;
 
                 if (resting.remaining == 0) {
-                    resting_queue.pop_front();
+                    sells_.pop_front(resting_price);
                 }
-            }
-
-            // Remove empty price levels
-            if (resting_queue.empty()) {
-                it = sells.erase(it);
-                continue;
-            } else {
-                ++it;
             }
         }
 
         if (remaining_qty > 0) {
             // Use incoming price as resting price
-            buys[incoming.price].push_back(BookOrder(incoming, remaining_qty));
+            buys_.push_back(incoming.price, BookOrder(incoming, remaining_qty));
         }
+
     } else { // incoming.side == Side::SELL
 
-        // Match incoming sell orders against highest available buy prices
-        for (auto it = buys.begin(); it != buys.end() && remaining_qty > 0; ) {
-            auto& [resting_price, resting_queue] = *it;
+        Price resting_price;
 
-            // Stop if bids are no longer matchable
-            if (resting_price < incoming.price) {
-                break;
-            }
+        // Match incoming sell orders against highest available buy prices
+        while (remaining_qty > 0 &&
+               (resting_price = buys_.best_price()) != 0 &&
+               resting_price >= incoming.price) {
 
             // Consume FIFO orders at this price level
-            while (remaining_qty > 0 && !resting_queue.empty()) {
-                auto& resting = resting_queue.front();
+            while (remaining_qty > 0 && !buys_.empty(resting_price)) {
+                BookOrder& resting = buys_.front(resting_price);
 
                 int filled_qty = std::min(remaining_qty, resting.remaining);
+
                 if (!sink_.submit(Trade(resting.order.id, incoming.id, resting_price, filled_qty))) {
                     // TODO: handle failure
                 }
+
                 remaining_qty -= filled_qty;
                 resting.remaining -= filled_qty;
 
                 if (resting.remaining == 0) {
-                    resting_queue.pop_front();
+                    buys_.pop_front(resting_price);
                 }
-            }
-
-            // Remove empty price levels
-            if (resting_queue.empty()) {
-                it = buys.erase(it);
-                continue;
-            } else {
-                ++it;
             }
         }
 
         if (remaining_qty > 0) {
             // Use incoming price as resting price
-            sells[incoming.price].push_back(BookOrder(incoming, remaining_qty));
+            sells_.push_back(incoming.price, BookOrder(incoming, remaining_qty));
         }
     }
 }

@@ -4,6 +4,8 @@
 
 namespace havarti {
 
+using Price = int64_t;
+
 enum class Side {
     BUY, SELL
 };
@@ -11,7 +13,7 @@ enum class Side {
 struct Order {
     int id;
     Side side;
-    int64_t price;
+    Price price;
     int quantity;
 };
 
