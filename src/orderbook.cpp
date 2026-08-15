@@ -1,4 +1,5 @@
 #include "orderbook.h"
+#include "order.h"
 
 namespace havarti {
 
@@ -13,11 +14,11 @@ OrderBook::add_order(const Order& incoming)
 
     if (incoming.side == Side::BUY) {
 
-        Price resting_price;
+        Price resting_price = NO_PRICE;
 
         // Match incoming buy orders against lowest available sell prices
         while (remaining_qty > 0 &&
-               (resting_price = sells_.best_price()) != 0 &&
+               (resting_price = sells_.best_price(resting_price)) != 0 &&
                resting_price <= incoming.price) {
 
             // Consume FIFO orders at this price level
@@ -45,11 +46,11 @@ OrderBook::add_order(const Order& incoming)
 
     } else { // incoming.side == Side::SELL
 
-        Price resting_price;
+        Price resting_price = NO_PRICE;
 
         // Match incoming sell orders against highest available buy prices
         while (remaining_qty > 0 &&
-               (resting_price = buys_.best_price()) != 0 &&
+               (resting_price = buys_.best_price(resting_price)) != NO_PRICE &&
                resting_price >= incoming.price) {
 
             // Consume FIFO orders at this price level

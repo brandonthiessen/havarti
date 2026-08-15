@@ -16,6 +16,7 @@ class PriceLevels {
 
         // Price navigation
         Price best_price() const;
+        Price best_price(Price price) const;
 
         // FIFO queue manipulation at a specific price
         void push_back(Price price, BookOrder order);

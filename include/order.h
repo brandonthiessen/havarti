@@ -5,6 +5,7 @@
 namespace havarti {
 
 using Price = int64_t;
+constexpr Price NO_PRICE = 0;
 
 enum class Side {
     BUY, SELL

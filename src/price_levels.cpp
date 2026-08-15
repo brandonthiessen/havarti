@@ -38,6 +38,127 @@ PriceLevels<side>::push_back(Price price, BookOrder order)
 
 template <Side side>
 Price
+PriceLevels<side>::best_price(Price bound) const
+{
+    if (bound == NO_PRICE)
+        return best_price();
+
+    Price dense_max = dense_min_ + dense_size;
+
+    if constexpr (side == Side::BUY) {
+        // Find highest price <= bound
+        if (bound < dense_min_) {
+            // Only low_ can contain a qualifying price
+            auto it = low_.upper_bound(bound);
+
+            if (it != low_.begin()) {
+                return std::prev(it)->first;
+            }
+
+            return 0;
+        }
+
+        // First check high_ if the bound is above the dense region
+        if (bound >= dense_max && !high_.empty()) {
+            auto it = high_.upper_bound(bound);
+
+            if (it != high_.begin()) {
+                return std::prev(it)->first;
+            }
+        }
+
+        // Search dense_
+        size_t idx = bound >= dense_max ? dense_size - 1 : static_cast<size_t>(bound - dense_min_);
+        size_t word = idx / word_size;
+        size_t bit = idx % word_size;
+
+        // Keep bits <= bound
+        uint64_t bits = occupied_[word];
+
+        if (bit != word_size - 1) {
+            bits &= (uint64_t{1} << (bit + 1)) - 1;
+        }
+
+        if (bits != 0) {
+            auto offset = 63 - std::countl_zero(bits);
+            return dense_min_ + word * word_size + offset;
+        }
+
+        // Search preceding words
+        for (size_t w = word; w-- > 0;) {
+            bits = occupied_[w];
+
+            if (bits == 0)
+                continue;
+
+            auto offset = 63 - std::countl_zero(bits);
+            return dense_min_ + w * word_size + offset;
+        }
+
+        // Nothing in dense_ <= bound, so fall back to low_
+        if (!low_.empty()) {
+            return low_.rbegin()->first;
+        }
+
+        return 0;
+
+    } else {
+        // Find lowest price >= bound
+        if (bound >= dense_max) {
+            // Only high_ can contain a qualifying price
+            auto it = high_.lower_bound(bound);
+
+            if (it != high_.end()) {
+                return it->first;
+            }
+
+            return 0;
+        }
+
+        // First check low_ if the bound is below the dense region
+        if (bound < dense_min_ && !low_.empty()) {
+            auto it = low_.lower_bound(bound);
+
+            if (it != low_.end()) {
+                return it->first;
+            }
+        }
+
+        // Search dense_
+        size_t idx = bound <= dense_min_ ? 0 : static_cast<size_t>(bound - dense_min_);
+        size_t word = idx / word_size;
+        size_t bit = idx % word_size;
+
+        // Keep bits >= bound
+        uint64_t bits = occupied_[word] & (~uint64_t{0} << bit);
+
+        if (bits != 0) {
+            auto offset = std::countr_zero(bits);
+            return dense_min_ + word * word_size + offset;
+        }
+
+        // Search following words
+        for (size_t w = word + 1; w < occupied_.size(); ++w) {
+            bits = occupied_[w];
+
+            if (bits == 0)
+                continue;
+
+            auto offset = std::countr_zero(bits);
+            return dense_min_ + w * word_size + offset;
+        }
+
+        // Nothing in dense_ >= bound, so fall back to high_
+        if (!high_.empty()) {
+            return high_.begin()->first;
+        }
+
+        return 0;
+    }
+}
+
+template <Side side>
+Price
 PriceLevels<side>::best_price() const
 {
     if constexpr (side == Side::BUY) {
