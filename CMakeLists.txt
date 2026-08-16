@@ -4,6 +4,12 @@ project(havarti)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS_RELEASENATIVE "-O3 -mcpu=native")
+
+add_compile_options(
+    $<$<CONFIG:Release>:-O3>
+)
+
 add_library(havarti_core
     src/orderbook.cpp
     src/order_generator.cpp
