@@ -7,15 +7,11 @@ namespace havarti {
 TradeSink::TradeSink(const size_t queue_capacity):
     queue_(queue_capacity),
     thread_(&TradeSink::run, this)
-{
-}
+{}
 
 TradeSink::~TradeSink()
 {
-    while (!queue_.empty()) {
-        std::this_thread::yield();
-    }
-    running_ = false;
+    running_.store(false, std::memory_order_relaxed);
     thread_.join();
 }
 
@@ -26,12 +22,18 @@ TradeSink::submit(const Trade& trade) {
 
 void
 TradeSink::run() {
-    while (running_) {
+    while (running_.load(std::memory_order_relaxed)) {
         Trade trade;
         while (queue_.try_pop(trade)) {
             // TODO: properly handle trades
             trades_processed++;
         }
+    }
+
+    // Drain anything submitted before shutdown
+    Trade trade;
+    while (queue_.try_pop(trade)) {
+        trades_processed++;
     }
 }
 
