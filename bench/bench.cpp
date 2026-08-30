@@ -1,4 +1,5 @@
 #include "bench.h"
+#include "timing.h"
 
 #include <algorithm>
 #include <cmath>
@@ -22,10 +23,13 @@ compute_bench_result(const BenchData& d)
 {
     BenchResult r;
 
-    int N = d.num_orders;
     r.num_orders = d.num_orders;
 
-    auto pct_idx = [](int n, int p) -> size_t { return static_cast<size_t>(std::floor((p / 100.0) * (n + 1))); };
+    auto pct_idx = [](size_t n, double p) -> size_t {
+        return static_cast<size_t>(
+                std::floor((p / 100.0) * (n + 1))
+                );
+    };
 
     if (d.start_ts != bench::TimePoint{}) {
         r.has_duration = true;
@@ -34,6 +38,8 @@ compute_bench_result(const BenchData& d)
 
     if (!d.latencies_ns.empty()) {
         r.has_latency = true;
+
+        size_t N = d.latencies_ns.size();
 
         auto latencies = d.latencies_ns;
         std::sort(latencies.begin(), latencies.end());
@@ -49,6 +55,8 @@ compute_bench_result(const BenchData& d)
 
     if (!d.trades.empty()) {
         r.has_trade_stats = true;
+
+        size_t N = d.trades.size();
 
         std::vector<size_t> trades_per_order;
         trades_per_order.reserve(N);
