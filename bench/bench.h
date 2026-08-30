@@ -19,7 +19,8 @@ struct BenchResult {
     bool has_latency = false;
     uint64_t p50_latency_ns = 0;
     uint64_t p99_latency_ns = 0;
-    uint64_t max_latency_ns = 0;
+    uint64_t p999_latency_ns = 0;
+    uint64_t p9999_latency_ns = 0;
 
     bool has_trade_stats = false;
     uint64_t p50_trades_per_order = 0;

@@ -44,13 +44,17 @@ compute_bench_result(const BenchData& d)
         auto latencies = d.latencies_ns;
         std::sort(latencies.begin(), latencies.end());
 
-        size_t p50_idx = pct_idx(N, 50);
-        r.p50_latency_ns = latencies.at(p50_idx);
+        size_t idx = pct_idx(N, 50);
+        r.p50_latency_ns = latencies.at(idx);
 
-        size_t p99_idx = pct_idx(N, 99);
-        r.p99_latency_ns = latencies.at(p99_idx);
+        idx = pct_idx(N, 99);
+        r.p99_latency_ns = latencies.at(idx);
 
-        r.max_latency_ns = latencies.back();
+        idx = pct_idx(N, 99.9);
+        r.p999_latency_ns = latencies.at(idx);
+
+        idx = pct_idx(N, 99.99);
+        r.p9999_latency_ns = latencies.at(idx);
     }
 
     if (!d.trades.empty()) {
@@ -108,7 +112,8 @@ output_bench_result(const BenchResult& r, std::string name)
         std::cout << "\n--- Latency (ns) ---\n";
         std::cout << "p50: " << r.p50_latency_ns << "\n";
         std::cout << "p99: " << r.p99_latency_ns << "\n";
-        std::cout << "Max: " << r.max_latency_ns << "\n";
+        std::cout << "p99.9: " << r.p999_latency_ns << "\n";
+        std::cout << "p99.99: " << r.p9999_latency_ns << "\n";
     }
 
     if (r.has_trade_stats) {
