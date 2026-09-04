@@ -10,7 +10,7 @@ BenchData bench_throughput() {
     havarti::OrderBook book(sink);
     havarti::OrderGenerator gen{42};
 
-    size_t N = 10'000'000;
+    size_t N = 100'000'000;
     d.num_orders = N;
 
     auto orders = gen.next_orders(N);
