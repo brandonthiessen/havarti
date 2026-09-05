@@ -34,5 +34,9 @@ BenchData bench_deep_book() {
 }
 
 int main() {
+#ifdef __APPLE__
+#include <pthread.h>
+    pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
+#endif
     run_bench("bench_deep_book", bench_deep_book);
 }
