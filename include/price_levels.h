@@ -26,7 +26,7 @@ class PriceLevels {
 
     private:
         static constexpr size_t dense_size = 4096;
-        static constexpr size_t word_size = sizeof(Price) * 8;
+        static constexpr size_t word_size = sizeof(uint64_t) * 8;
         std::array<std::deque<BookOrder>, dense_size> dense_;
         std::array<uint64_t, dense_size / word_size> occupied_;
         uint64_t occupied_words_;
