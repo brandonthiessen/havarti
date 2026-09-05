@@ -46,6 +46,20 @@ It implements **price-time priority matching**, FIFO order queues, cache-friendl
 
 `PriceLevels` keeps a dense window of price levels backed by occupancy bitmaps, allowing the best price to be found without scanning every price level. Prices outside the dense window are stored in ordered maps.
 
+## Benchmarks
+
+Benchmarks were run on Apple Silicon using a native optimized build (`-O3 -mcpu=native`) with a single benchmark thread.
+
+| Metric      |               Result |
+| ----------- | -------------------: |
+| Throughput  | **61.0M orders/sec** |
+| p50 latency |            **16 ns** |
+| p99 latency |            **21 ns** |
+
+The latency benchmark processes orders in batches of 100 and reports the average processing time per order for each batch. Batching is used because the effective clock granularity on the test system was too coarse to reliably measure individual orders at nanosecond-scale latencies.
+
+Results may vary with CPU scheduling and system load.
+
 ## Building
 
 Requires a C++20 compiler and CMake 3.16+.
