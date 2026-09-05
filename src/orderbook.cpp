@@ -10,7 +10,7 @@ OrderBook::OrderBook(TradeSink& sink):
 void
 OrderBook::add_order(const Order& incoming)
 {
-    int remaining_qty = incoming.quantity;
+    Quantity remaining_qty = incoming.quantity;
 
     if (incoming.side == Side::BUY) {
 
@@ -26,7 +26,7 @@ OrderBook::add_order(const Order& incoming)
                 BookOrder& resting = sells_.front(resting_price);
 
                 int filled_qty = std::min(remaining_qty, resting.remaining);
-                if (!sink_.submit(Trade(incoming.id, resting.order.id, resting_price, filled_qty))) {
+                if (!sink_.submit(Trade(incoming.id, resting.id, resting_price, filled_qty))) {
                     // TODO: handle failure
                 }
 
@@ -41,7 +41,7 @@ OrderBook::add_order(const Order& incoming)
 
         if (remaining_qty > 0) {
             // Use incoming price as resting price
-            buys_.push_back(incoming.price, BookOrder(incoming, remaining_qty));
+            buys_.push_back(incoming.price, BookOrder{incoming.id, remaining_qty});
         }
 
     } else { // incoming.side == Side::SELL
@@ -59,7 +59,7 @@ OrderBook::add_order(const Order& incoming)
 
                 int filled_qty = std::min(remaining_qty, resting.remaining);
 
-                if (!sink_.submit(Trade(resting.order.id, incoming.id, resting_price, filled_qty))) {
+                if (!sink_.submit(Trade(resting.id, incoming.id, resting_price, filled_qty))) {
                     // TODO: handle failure
                 }
 
@@ -74,7 +74,7 @@ OrderBook::add_order(const Order& incoming)
 
         if (remaining_qty > 0) {
             // Use incoming price as resting price
-            sells_.push_back(incoming.price, BookOrder(incoming, remaining_qty));
+            sells_.push_back(incoming.price, BookOrder{incoming.id, remaining_qty});
         }
     }
 }

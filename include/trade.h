@@ -1,14 +1,14 @@
 #pragma once
 
-#include <cstdint>
+#include "order.h"
 
 namespace havarti {
 
 struct Trade {
-    int buy_order_id;
-    int sell_order_id;
-    int64_t price;
-    int quantity;
+    OrderId buy_order_id;
+    OrderId sell_order_id;
+    Price price;
+    Quantity quantity;
 };
 
 } // namespace havarti

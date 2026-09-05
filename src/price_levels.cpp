@@ -1,6 +1,5 @@
 #include "price_levels.h"
 
-#include <algorithm>
 #include <bit>
 #include <cassert>
 #include <cstdint>
@@ -17,7 +16,8 @@ PriceLevels<side>::push_back(Price price, BookOrder order)
 {
     if (!initialized_) {
         // Force invariant: dense_min_ >= 0
-        dense_min_ = std::max<Price>(0, price - static_cast<Price>(dense_size / 2));
+        const Price half = dense_size / 2;
+        dense_min_ = price >= half ? price - half : 0;
         initialized_ = true;
     }
 

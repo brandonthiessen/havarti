@@ -1,4 +1,5 @@
 #include "order_generator.h"
+#include "order.h"
 
 namespace havarti {
 
@@ -6,19 +7,19 @@ OrderGenerator::OrderGenerator(int seed)
     : rng(seed), side_dist(0, 1), price_dist(MID_PRICE - 50, MID_PRICE + 50), qty_dist(1, 100), next_id(1)
 {}
 
-OrderGenerator::OrderGenerator(int seed, int64_t price_low, int64_t price_high, int qty_low, int qty_high)
+OrderGenerator::OrderGenerator(int seed, Price price_low, Price price_high, Quantity qty_low, Quantity qty_high)
     : rng(seed), side_dist(0, 1), price_dist(price_low, price_high), qty_dist(qty_low, qty_high), next_id(1)
 {}
 
 Order
 OrderGenerator::next_order()
 {
-    return Order{next_id++, side_dist(rng) == 0 ? Side::BUY : Side::SELL, price_dist(rng), qty_dist(rng)};
+    return Order{next_id++, price_dist(rng), qty_dist(rng), side_dist(rng) == 0 ? Side::BUY : Side::SELL};
 }
 
 Order
 OrderGenerator::next_order(Side side) {
-    return Order{next_id++, side, price_dist(rng), qty_dist(rng)};
+    return Order{next_id++, price_dist(rng), qty_dist(rng), side};
 }
 
 std::vector<Order>

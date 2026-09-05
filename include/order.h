@@ -4,25 +4,26 @@
 
 namespace havarti {
 
-using Price = int64_t;
+using Price = uint32_t;
+using Quantity = uint32_t;
+using OrderId = uint32_t;
+
 constexpr Price NO_PRICE = 0;
 
-enum class Side {
+enum class Side : std::uint8_t {
     BUY, SELL
 };
 
 struct Order {
-    int id;
-    Side side;
+    OrderId id;
     Price price;
-    int quantity;
+    Quantity quantity;
+    Side side;
 };
 
 struct BookOrder {
-    Order order;
-    int remaining;
-    BookOrder(const Order& o, int r)
-        : order(o), remaining(r) {}
+    OrderId id;
+    Quantity remaining;
 };
 
 } // namespace havarti

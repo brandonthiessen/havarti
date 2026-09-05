@@ -30,9 +30,9 @@ bench_dense_price_levels()
     auto orders = gen.next_orders(N);
 
     // Insert buy and sell orders to center the dense window at $100 on both sides.
-    book.add_order({-3, havarti::Side::BUY, 10000, 1});
-    book.add_order({-2, havarti::Side::SELL, 10000, 2});
-    book.add_order({-1, havarti::Side::BUY, 10000, 1});
+    book.add_order({INT32_MAX - 1, 10000, 1, havarti::Side::BUY});
+    book.add_order({INT32_MAX - 2, 10000, 2, havarti::Side::SELL});
+    book.add_order({INT32_MAX - 3, 10000, 1, havarti::Side::BUY});
 
     d.start_ts = bench::now();
 
