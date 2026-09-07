@@ -1,15 +1,15 @@
+#include "async_trade_sink.h"
 #include "bench.h"
 #include "order.h"
 #include "order_generator.h"
 #include "orderbook.h"
-#include "trade_sink.h"
 
 BenchData
 bench_dense_price_levels()
 {
     BenchData d;
 
-    havarti::TradeSink sink(8192);
+    havarti::AsyncTradeSink sink(8192);
     havarti::OrderBook book(sink);
 
     constexpr int DENSE_MIN = 7952;

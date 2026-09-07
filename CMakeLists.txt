@@ -13,7 +13,7 @@ add_compile_options(
 add_library(havarti_core
     src/orderbook.cpp
     src/order_generator.cpp
-    src/trade_sink.cpp
+    src/async_trade_sink.cpp
     src/price_levels.cpp
 )
 

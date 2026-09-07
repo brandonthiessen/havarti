@@ -1,12 +1,12 @@
+#include "async_trade_sink.h"
 #include "bench.h"
 #include "order_generator.h"
 #include "orderbook.h"
-#include "trade_sink.h"
 
 BenchData bench_deep_book() {
     BenchData d;
 
-    havarti::TradeSink sink(8192);
+    havarti::AsyncTradeSink sink(8192);
     havarti::OrderBook book(sink);
     havarti::OrderGenerator gen{42};
 

@@ -1,12 +1,12 @@
+#include "async_trade_sink.h"
 #include "bench.h"
 #include "order_generator.h"
 #include "orderbook.h"
-#include "trade_sink.h"
 
 BenchData bench_one_sided_pressure() {
     BenchData d;
 
-    havarti::TradeSink sink(8192);
+    havarti::AsyncTradeSink sink(8192);
     havarti::OrderBook book(sink);
 
     // Generate orders biased 70:30 buys:sells

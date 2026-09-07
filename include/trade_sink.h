@@ -1,35 +1,14 @@
 #pragma once
 
-#include "ring_buffer.h"
 #include "trade.h"
-
-#include <atomic>
-#include <cstddef>
-#include <thread>
 
 namespace havarti {
 
 class TradeSink {
     public:
-        explicit TradeSink(const size_t queue_capacity);
+        virtual ~TradeSink() = default;
 
-        // TradeSink represents a communication channel and cannot be copied or moved.
-        TradeSink(const TradeSink&) = delete;
-        TradeSink& operator=(const TradeSink&) = delete;
-        TradeSink(TradeSink&&) = delete;
-        TradeSink& operator=(TradeSink&&) = delete;
-
-        ~TradeSink();
-        bool submit(const Trade& trade);
-
-    private:
-        void run();
-
-        int trades_processed;
-
-        std::thread thread_;
-        SpscRingBuffer<Trade> queue_;
-        std::atomic<bool> running_{true};
+        virtual bool submit(const Trade& trade) = 0;
 };
 
 } // namespace havarti

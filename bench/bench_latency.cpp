@@ -1,3 +1,4 @@
+#include "async_trade_sink.h"
 #include "bench.h"
 #include "order_generator.h"
 #include "orderbook.h"
@@ -12,7 +13,7 @@ BenchData bench_latency()
     constexpr size_t N = 10'000'000;
     constexpr size_t BATCH_SIZE = 100;
 
-    havarti::TradeSink sink(8192);
+    havarti::AsyncTradeSink sink(8192);
     havarti::OrderBook book(sink);
     havarti::OrderGenerator gen{42};
 
