@@ -12,20 +12,28 @@ add_compile_options(
 
 add_library(havarti_core
     src/orderbook.cpp
-    src/order_generator.cpp
     src/async_trade_sink.cpp
     src/price_levels.cpp
 )
 
 target_include_directories(havarti_core PUBLIC include)
 
+add_library(havarti_support
+    support/mock_trade_sink.cpp
+    support/order_generator.cpp
+)
+
+target_include_directories(havarti_support PUBLIC include support)
+
+target_link_libraries(havarti_support PUBLIC havarti_core)
+
 add_library(havarti_bench
     bench/bench.cpp
 )
 
-target_include_directories(havarti_bench PUBLIC bench include)
+target_include_directories(havarti_bench PUBLIC bench include support)
 
-target_link_libraries(havarti_bench PUBLIC havarti_core)
+target_link_libraries(havarti_bench PUBLIC havarti_core havarti_support)
 
 add_executable(bench_throughput
     bench/bench_throughput.cpp
@@ -33,7 +41,6 @@ add_executable(bench_throughput
 
 target_link_libraries(bench_throughput
     havarti_bench
-    havarti_core
 )
 
 add_executable(bench_latency
@@ -42,7 +49,6 @@ add_executable(bench_latency
 
 target_link_libraries(bench_latency
     havarti_bench
-    havarti_core
 )
 
 add_executable(bench_deep_book
@@ -51,7 +57,6 @@ add_executable(bench_deep_book
 
 target_link_libraries(bench_deep_book
     havarti_bench
-    havarti_core
 )
 
 add_executable(bench_one_sided_pressure
@@ -60,7 +65,6 @@ add_executable(bench_one_sided_pressure
 
 target_link_libraries(bench_one_sided_pressure
     havarti_bench
-    havarti_core
 )
 
 add_executable(bench_dense_price_levels
@@ -69,7 +73,6 @@ add_executable(bench_dense_price_levels
 
 target_link_libraries(bench_dense_price_levels
     havarti_bench
-    havarti_core
 )
 
 add_executable(app
