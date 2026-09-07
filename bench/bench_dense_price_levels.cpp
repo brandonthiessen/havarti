@@ -4,6 +4,8 @@
 #include "order_generator.h"
 #include "orderbook.h"
 
+namespace havarti::bench {
+
 BenchData
 bench_dense_price_levels()
 {
@@ -16,7 +18,7 @@ bench_dense_price_levels()
     constexpr int DENSE_MAX = 12047;
 
     // Every generated order is guaranteed to lie inside the dense price-level range.
-    havarti::OrderGenerator gen{
+    havarti::support::OrderGenerator gen{
         42,
         DENSE_MIN,
         DENSE_MAX,
@@ -45,11 +47,13 @@ bench_dense_price_levels()
     return d;
 }
 
+} // namespace havarti::bench
+
 int main()
 {
 #ifdef __APPLE__
 #include <pthread.h>
     pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
 #endif
-    run_bench("bench_dense_price_levels", bench_dense_price_levels);
+    havarti::bench::run_bench("bench_dense_price_levels", havarti::bench::bench_dense_price_levels);
 }

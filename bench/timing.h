@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace bench {
+namespace havarti::bench {
     using Clock = std::chrono::steady_clock;
     using TimePoint = Clock::time_point;
 
@@ -17,4 +17,4 @@ namespace bench {
     inline double to_seconds(std::chrono::nanoseconds ns) {
         return std::chrono::duration<double>(ns).count();
     }
-} // namespace bench
+} // namespace havarti::bench

@@ -1,7 +1,7 @@
 #include "order_generator.h"
 #include "order.h"
 
-namespace havarti {
+namespace havarti::support {
 
 OrderGenerator::OrderGenerator(int seed)
     : rng(seed), side_dist(0, 1), price_dist(MID_PRICE - 50, MID_PRICE + 50), qty_dist(1, 100), next_id(1)
@@ -48,4 +48,4 @@ OrderGenerator::next_orders(int n, Side side)
     return orders;
 }
 
-} // namespace havarti
+} // namespace havarti::support

@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace test {
+namespace havarti::support {
 
 class MockTradeSink final : public havarti::TradeSink {
     public:
@@ -14,4 +14,4 @@ class MockTradeSink final : public havarti::TradeSink {
         std::vector<havarti::Trade> trades;
 };
 
-} // namespace test
+} // namespace havarti::support

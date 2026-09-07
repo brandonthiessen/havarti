@@ -8,6 +8,8 @@
 #include <numeric>
 #include <vector>
 
+namespace havarti::bench {
+
 void
 run_bench(std::string name, std::function<BenchData()> f)
 {
@@ -31,7 +33,7 @@ compute_bench_result(const BenchData& d)
                 );
     };
 
-    if (d.start_ts != bench::TimePoint{}) {
+    if (d.start_ts != TimePoint{}) {
         r.has_duration = true;
         r.duration = d.end_ts - d.start_ts;
     }
@@ -100,12 +102,12 @@ output_bench_result(const BenchResult& r, std::string name)
 
         std::cout << std::format(
                 "Duration: {:.6f}s ({}ns)\n",
-                bench::to_seconds(r.duration),
+                to_seconds(r.duration),
                 r.duration.count());
 
         std::cout << std::format(
                 "Throughput: {:.2f} orders/sec\n",
-                r.num_orders / bench::to_seconds(r.duration));
+                r.num_orders / to_seconds(r.duration));
     }
 
     if (r.has_latency) {
@@ -125,3 +127,5 @@ output_bench_result(const BenchResult& r, std::string name)
 
     std::cout << std::endl;
 }
+
+} // namespace havarti::bench

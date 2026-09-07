@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <cstdint>
 
+namespace havarti::bench {
+
 BenchData bench_latency()
 {
     BenchData d;
@@ -15,7 +17,7 @@ BenchData bench_latency()
 
     havarti::AsyncTradeSink sink(8192);
     havarti::OrderBook book(sink);
-    havarti::OrderGenerator gen{42};
+    havarti::support::OrderGenerator gen{42};
 
     d.num_orders = N;
 
@@ -48,11 +50,13 @@ BenchData bench_latency()
     return d;
 }
 
+} // namespace havarti::bench
+
 int main()
 {
 #ifdef __APPLE__
 #include <pthread.h>
     pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
 #endif
-    run_bench("bench_latency", bench_latency);
+    havarti::bench::run_bench("bench_latency", havarti::bench::bench_latency);
 }

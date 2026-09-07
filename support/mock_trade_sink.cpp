@@ -1,7 +1,7 @@
 #include "mock_trade_sink.h"
 #include "trade.h"
 
-namespace test {
+namespace havarti::support {
 
 bool
 MockTradeSink::submit(const havarti::Trade& trade)
@@ -10,4 +10,4 @@ MockTradeSink::submit(const havarti::Trade& trade)
     return true;
 }
 
-} // namespace test
+} // namespace havarti::support

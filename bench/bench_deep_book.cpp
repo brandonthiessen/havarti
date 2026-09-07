@@ -3,12 +3,14 @@
 #include "order_generator.h"
 #include "orderbook.h"
 
+namespace havarti::bench {
+
 BenchData bench_deep_book() {
     BenchData d;
 
     havarti::AsyncTradeSink sink(8192);
     havarti::OrderBook book(sink);
-    havarti::OrderGenerator gen{42};
+    havarti::support::OrderGenerator gen{42};
 
     // Pre-populate with 100k buy orders
     size_t warmup = 100'000;
@@ -22,21 +24,23 @@ BenchData bench_deep_book() {
     auto aggressive_orders = gen.next_orders(N, havarti::Side::SELL);
     d.num_orders = N;
 
-    d.start_ts = bench::now();
+    d.start_ts = now();
 
     for (auto& o : aggressive_orders) {
         book.add_order(o);
     }
 
-    d.end_ts = bench::now();
+    d.end_ts = now();
 
     return d;
 }
+
+} // namespace havarti::bench
 
 int main() {
 #ifdef __APPLE__
 #include <pthread.h>
     pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
 #endif
-    run_bench("bench_deep_book", bench_deep_book);
+    havarti::bench::run_bench("bench_deep_book", havarti::bench::bench_deep_book);
 }

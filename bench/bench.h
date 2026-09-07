@@ -9,6 +9,8 @@
 #include <functional>
 #include <string>
 
+namespace havarti::bench {
+
 struct BenchResult {
     size_t num_orders = 0;
     size_t num_trades = 0;
@@ -34,10 +36,12 @@ struct BenchData {
     std::vector<uint64_t> latencies_ns;
     std::vector<std::vector<havarti::Trade>> trades;
 
-    bench::TimePoint start_ts{};
-    bench::TimePoint end_ts{};
+    TimePoint start_ts{};
+    TimePoint end_ts{};
 };
 
 void run_bench(std::string name, std::function<BenchData()> f);
 BenchResult compute_bench_result(const BenchData& d);
 void output_bench_result(const BenchResult& r, std::string name);
+
+} // namespace havarti::bench

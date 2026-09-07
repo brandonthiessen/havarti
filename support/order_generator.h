@@ -4,7 +4,7 @@
 
 #include <random>
 
-namespace havarti {
+namespace havarti::support {
 
 static constexpr int64_t MID_PRICE = 1000; // 10.00
 
@@ -25,4 +25,4 @@ class OrderGenerator {
         OrderId next_id = 1;
 };
 
-} // namespace havarti
+} // namespace havarti::support

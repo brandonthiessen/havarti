@@ -3,6 +3,8 @@
 #include "order_generator.h"
 #include "orderbook.h"
 
+namespace havarti::bench {
+
 BenchData bench_one_sided_pressure() {
     BenchData d;
 
@@ -10,8 +12,8 @@ BenchData bench_one_sided_pressure() {
     havarti::OrderBook book(sink);
 
     // Generate orders biased 70:30 buys:sells
-    havarti::OrderGenerator gen_buys{42, 9500, 9900, 1, 100};
-    havarti::OrderGenerator gen_sells{43, 10100, 10500, 1, 100};
+    havarti::support::OrderGenerator gen_buys{42, 9500, 9900, 1, 100};
+    havarti::support::OrderGenerator gen_sells{43, 10100, 10500, 1, 100};
 
     size_t num_buys = 7'000'000;
     size_t num_sells = 3'000'000;
@@ -32,21 +34,23 @@ BenchData bench_one_sided_pressure() {
         }
     }
 
-    d.start_ts = bench::now();
+    d.start_ts = now();
 
     for (auto& o : orders) {
         book.add_order(o);
     }
 
-    d.end_ts = bench::now();
+    d.end_ts = now();
 
     return d;
 }
+
+} // namespace havarti::bench
 
 int main() {
 #ifdef __APPLE__
 #include <pthread.h>
     pthread_set_qos_class_self_np(QOS_CLASS_USER_INTERACTIVE, 0);
 #endif
-    run_bench("bench_one_sided_pressure", bench_one_sided_pressure);
+    havarti::bench::run_bench("bench_one_sided_pressure", havarti::bench::bench_one_sided_pressure);
 }
