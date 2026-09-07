@@ -98,8 +98,10 @@ Available benchmarks include:
 ```text
 havarti/
 ├── include/        # Public headers and core data structures
-├── src/            # Order book, price levels, trade sink, generator
-├── bench/          # Benchmark implementations
+├── src/            # Core implementation
+├── support/        # Shared development and test support
+├── bench/          # Benchmark implementations and infrastructure
+├── tests/          # Test case implementations and infrastructure
 ├── scripts/        # Build and benchmark scripts
 └── CMakeLists.txt
 ```
