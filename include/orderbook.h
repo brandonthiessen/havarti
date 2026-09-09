@@ -13,6 +13,7 @@ class OrderBook {
         OrderBook& operator=(const OrderBook&) = delete;
 
         void add_order(const Order& incoming);
+        bool cancel_order(const OrderId id);
     private:
         PriceLevels<Side::BUY> buys_; // Ordered by price (high-low)
         PriceLevels<Side::SELL> sells_; // Ordered by price (low-high)

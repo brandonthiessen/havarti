@@ -21,24 +21,30 @@ PriceLevels<side>::push_back(Price price, BookOrder order)
         initialized_ = true;
     }
 
+    std::list<BookOrder>* queue;
+
     if (price < dense_min_) {
-        low_[price].push_back(std::move(order));
-        return;
+        queue = &low_[price];
     } else if (price >= dense_min_ + dense_size) {
-        high_[price].push_back(std::move(order));
-        return;
+        queue = &high_[price];
+    } else {
+
+        size_t idx = price - dense_min_;
+        size_t word = idx / word_size;
+        size_t bit = idx % word_size;
+
+        if (occupied_[word] == 0) {
+            occupied_words_ |= uint64_t{1} << word;
+        }
+
+        occupied_[word] |= uint64_t{1} << bit;
+        queue = &dense_[idx];
     }
 
-    size_t idx = price - dense_min_;
-    size_t word = idx / word_size;
-    size_t bit = idx % word_size;
+    queue->push_back(std::move(order));
 
-    if (occupied_[word] == 0) {
-        occupied_words_ |= uint64_t{1} << word;
-    }
-
-    occupied_[word] |= uint64_t{1} << bit;
-    dense_[idx].push_back(std::move(order));
+    auto it = std::prev(queue->end());
+    orders_[it->id] = {price, it};
 }
 
 template <Side side>
@@ -109,7 +115,10 @@ PriceLevels<side>::pop_front(Price price)
     // Pricing outliers
     if (price < dense_min_) {
         auto& queue = low_.at(price);
+        const OrderId id = queue.front().id;
+
         queue.pop_front();
+        orders_.erase(id);
 
         if (queue.empty()) {
             low_.erase(price);
@@ -120,7 +129,10 @@ PriceLevels<side>::pop_front(Price price)
 
     if (price >= dense_min_ + dense_size) {
         auto& queue = high_.at(price);
+        const OrderId id = queue.front().id;
+
         queue.pop_front();
+        orders_.erase(id);
 
         if (queue.empty()) {
             high_.erase(price);
@@ -131,7 +143,12 @@ PriceLevels<side>::pop_front(Price price)
 
     size_t idx = price - dense_min_;
     assert(!dense_[idx].empty());
-    dense_[idx].pop_front();
+
+    auto& queue = dense_[idx];
+    const OrderId id = queue.front().id;
+
+    queue.pop_front();
+    orders_.erase(id);
 
     if (dense_[idx].empty()) {
         // Indicate that this price level is empty
@@ -157,6 +174,51 @@ PriceLevels<side>::empty(Price price) const
 
     size_t idx = price - dense_min_;
     return dense_[idx].empty();
+}
+
+template <Side side>
+bool
+PriceLevels<side>::erase(const OrderId id)
+{
+    const auto map_it = orders_.find(id);
+    if (map_it == orders_.end()) return false;
+
+    const auto& [price, list_it] = map_it->second;
+
+    if (price < dense_min_) {
+        auto& queue = low_.at(price);
+        queue.erase(list_it);
+
+        if (queue.empty()) {
+            low_.erase(price);
+        }
+
+    } else if (price >= dense_min_ + dense_size) {
+        auto& queue = high_.at(price);
+        queue.erase(list_it);
+
+        if (queue.empty()) {
+            high_.erase(price);
+        }
+
+    } else {
+        size_t idx = price - dense_min_;
+        dense_[idx].erase(list_it);
+        if (dense_[idx].empty()) {
+            size_t word = idx / word_size;
+            size_t bit = idx % word_size;
+
+            occupied_[word] &= ~(uint64_t{1} << bit);
+
+            if (occupied_[word] == 0) {
+                occupied_words_ &= ~(uint64_t{1} << word);
+            }
+        }
+
+    }
+    
+    orders_.erase(map_it);
+    return true;
 }
 
 template class PriceLevels<Side::BUY>;

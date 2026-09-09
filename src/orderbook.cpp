@@ -79,4 +79,10 @@ OrderBook::add_order(const Order& incoming)
     }
 }
 
+bool
+OrderBook::cancel_order(const OrderId id)
+{
+    return buys_.erase(id) && sells_.erase(id);
+}
+
 } // namespace havarti
