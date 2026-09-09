@@ -25,7 +25,7 @@ OrderBook::add_order(const Order& incoming)
             while (remaining_qty > 0 && !sells_.empty(resting_price)) {
                 BookOrder& resting = sells_.front(resting_price);
 
-                int filled_qty = std::min(remaining_qty, resting.remaining);
+                Quantity filled_qty = std::min(remaining_qty, resting.remaining);
                 if (!sink_.submit(Trade(incoming.id, resting.id, resting_price, filled_qty))) {
                     // TODO: handle failure
                 }
@@ -57,7 +57,7 @@ OrderBook::add_order(const Order& incoming)
             while (remaining_qty > 0 && !buys_.empty(resting_price)) {
                 BookOrder& resting = buys_.front(resting_price);
 
-                int filled_qty = std::min(remaining_qty, resting.remaining);
+                Quantity filled_qty = std::min(remaining_qty, resting.remaining);
 
                 if (!sink_.submit(Trade(resting.id, incoming.id, resting_price, filled_qty))) {
                     // TODO: handle failure
