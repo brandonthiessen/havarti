@@ -74,11 +74,3 @@ add_executable(bench_dense_price_levels
 target_link_libraries(bench_dense_price_levels
     havarti_bench
 )
-
-add_executable(app
-    src/main.cpp
-)
-
-target_link_libraries(app
-    havarti_core
-)
