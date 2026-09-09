@@ -28,3 +28,4 @@ target_include_directories(havarti_support PUBLIC include support)
 target_link_libraries(havarti_support PUBLIC havarti_core)
 
 add_subdirectory(bench)
+add_subdirectory(tests)
