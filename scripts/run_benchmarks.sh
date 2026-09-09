@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 ROOT_DIR="$(dirname "$0")/.."
 
 if [ -d "$ROOT_DIR/build/release-native/bench" ]; then
