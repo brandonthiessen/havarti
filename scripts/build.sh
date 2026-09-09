@@ -27,4 +27,4 @@ cmake -S . -B "$BUILD_DIR" \
 
 ln -sf "$BUILD_DIR/compile_commands.json" compile_commands.json
 
-cmake --build "$BUILD_DIR"
+cmake --build "$BUILD_DIR" --parallel
