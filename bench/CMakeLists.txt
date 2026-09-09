@@ -2,9 +2,11 @@ add_library(havarti_bench
     bench.cpp
 )
 
-target_include_directories(havarti_bench PUBLIC bench include support)
-
-target_link_libraries(havarti_bench PUBLIC havarti_core havarti_support)
+target_link_libraries(havarti_bench
+    PUBLIC
+        havarti_core
+        havarti_support
+)
 
 function(add_havarti_benchmark name)
     add_executable(bench_${name}
