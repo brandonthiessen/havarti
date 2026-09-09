@@ -2,12 +2,12 @@
 
 ROOT_DIR="$(dirname "$0")/.."
 
-if [ -d "$ROOT_DIR/build/release-native" ]; then
-    BUILD_DIR="$ROOT_DIR/build/release-native"
-elif [ -d "$ROOT_DIR/build/release" ]; then
-    BUILD_DIR="$ROOT_DIR/build/release"
+if [ -d "$ROOT_DIR/build/release-native/bench" ]; then
+    BUILD_DIR="$ROOT_DIR/build/release-native/bench"
+elif [ -d "$ROOT_DIR/build/release/bench" ]; then
+    BUILD_DIR="$ROOT_DIR/build/release/bench"
 else
-    echo "Error: neither build/release-native nor build/release exists."
+    echo "Error: neither build/release-native/bench nor build/release/bench exists."
     exit 1
 fi
 
