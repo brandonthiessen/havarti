@@ -1,47 +1,23 @@
 add_library(havarti_bench
-    bench/bench.cpp
+    bench.cpp
 )
 
 target_include_directories(havarti_bench PUBLIC bench include support)
 
 target_link_libraries(havarti_bench PUBLIC havarti_core havarti_support)
 
-add_executable(bench_throughput
-    bench/bench_throughput.cpp
-)
+function(add_havarti_benchmark name)
+    add_executable(bench_${name}
+        bench_${name}.cpp
+    )
 
-target_link_libraries(bench_throughput
-    havarti_bench
-)
+    target_link_libraries(bench_${name}
+        havarti_bench
+    )
+endfunction()
 
-add_executable(bench_latency
-    bench/bench_latency.cpp
-)
-
-target_link_libraries(bench_latency
-    havarti_bench
-)
-
-add_executable(bench_deep_book
-    bench/bench_deep_book.cpp
-)
-
-target_link_libraries(bench_deep_book
-    havarti_bench
-)
-
-add_executable(bench_one_sided_pressure
-    bench/bench_one_sided_pressure.cpp
-)
-
-target_link_libraries(bench_one_sided_pressure
-    havarti_bench
-)
-
-add_executable(bench_dense_price_levels
-    bench/bench_dense_price_levels.cpp
-)
-
-target_link_libraries(bench_dense_price_levels
-    havarti_bench
-)
+add_havarti_benchmark(throughput)
+add_havarti_benchmark(latency)
+add_havarti_benchmark(deep_book)
+add_havarti_benchmark(one_sided_pressure)
+add_havarti_benchmark(dense_price_levels)
