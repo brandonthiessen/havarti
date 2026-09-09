@@ -6,8 +6,6 @@ FetchContent_Declare(
     GIT_TAG v1.18.0
 )
 
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
