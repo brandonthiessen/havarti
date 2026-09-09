@@ -13,6 +13,7 @@ It implements **price-time priority matching**, FIFO order queues, cache-friendl
 * Lock-free single-producer/single-consumer trade queue
 * Deterministic synthetic order generation
 * Throughput and latency benchmarks
+* GoogleTest unit test suite
 * C++20 / CMake build system
 
 ## Architecture
@@ -78,6 +79,12 @@ For optimized builds:
 `release-native` enables `-O3` and `-mcpu=native`.
 
 ## Running
+
+Run the test suite with:
+
+```bash
+./scripts/run_tests.sh
+```
 
 Run the benchmark suite with:
 
