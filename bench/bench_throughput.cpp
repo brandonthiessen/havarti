@@ -11,6 +11,15 @@ BenchData bench_throughput() {
     havarti::AsyncTradeSink sink(8192);
     havarti::OrderBook book(sink);
     havarti::support::OrderGenerator gen{42};
+    /*
+    havarti::support::OrderGenerator gen{
+        42,
+        support::BoundedNormalPrice{1000, 15, 950, 1050},
+        [](std::mt19937& rng) {
+            return std::uniform_int_distribution<Quantity>{1, 100}(rng);
+        }
+    };
+    */
 
     size_t N = 100'000'000;
     d.num_orders = N;

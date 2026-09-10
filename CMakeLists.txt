@@ -11,8 +11,10 @@ add_compile_options(
 )
 
 add_library(havarti_core
-    src/orderbook.cpp
     src/async_trade_sink.cpp
+    src/order_pool.cpp
+    src/orderbook.cpp
+    src/price_level.cpp
     src/price_levels.cpp
 )
 

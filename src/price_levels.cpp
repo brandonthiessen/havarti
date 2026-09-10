@@ -1,14 +1,20 @@
+#include "order.h"
+#include "order_pool.h"
+#include "price_level.h"
 #include "price_levels.h"
 
 #include <bit>
 #include <cassert>
 #include <cstdint>
+#include <sys/types.h>
 
 namespace havarti {
 
 template <Side side>
 PriceLevels<side>::PriceLevels() : occupied_{}, occupied_words_{}
-{}
+{
+    orders_.reserve(100'000'000);
+}
 
 template <Side side>
 void
@@ -21,12 +27,12 @@ PriceLevels<side>::push_back(Price price, BookOrder order)
         initialized_ = true;
     }
 
-    std::list<BookOrder>* queue;
+    PriceLevel* level;
 
     if (price < dense_min_) {
-        queue = &low_[price];
+        level = &low_[price];
     } else if (price >= dense_min_ + dense_size) {
-        queue = &high_[price];
+        level = &high_[price];
     } else {
 
         size_t idx = price - dense_min_;
@@ -38,13 +44,14 @@ PriceLevels<side>::push_back(Price price, BookOrder order)
         }
 
         occupied_[word] |= uint64_t{1} << bit;
-        queue = &dense_[idx];
+        level = &dense_[idx];
     }
 
-    queue->push_back(std::move(order));
+    const uint32_t index = pool_.allocate(std::move(order), price);
 
-    auto it = std::prev(queue->end());
-    orders_[it->id] = {price, it};
+    level->push_back(pool_, index);
+
+    orders_[pool_[index].order.id] = index;
 }
 
 template <Side side>
@@ -100,65 +107,63 @@ BookOrder&
 PriceLevels<side>::front(Price price)
 {
     // Pricing outliers
-    if (price < dense_min_) return low_.at(price).front();
-    if (price >= dense_min_ + dense_size) return high_.at(price).front();
+    PriceLevel* level;
 
-    size_t idx = price - dense_min_;
-    assert(!dense_[idx].empty());
-    return dense_[idx].front();
+    if (price < dense_min_) {
+        level = &low_.at(price);
+    } else if (price >= dense_min_ + dense_size) {
+        level = &high_.at(price);
+    } else {
+        const size_t idx = price - dense_min_;
+        level = &dense_[idx];
+    }
+
+    return level->front(pool_);
 }
 
 template <Side side>
 void
 PriceLevels<side>::pop_front(Price price)
 {
-    // Pricing outliers
+    PriceLevel* level;
+    bool dense = false;
+
     if (price < dense_min_) {
-        auto& queue = low_.at(price);
-        const OrderId id = queue.front().id;
+        level = &low_.at(price);
 
-        queue.pop_front();
-        orders_.erase(id);
+    } else if (price >= dense_min_ + dense_size) {
+        level = &high_.at(price);
 
-        if (queue.empty()) {
-            low_.erase(price);
-        }
-
-        return;
+    } else {
+        const size_t idx = price - dense_min_;
+        level = &dense_[idx];
+        dense = true;
     }
 
-    if (price >= dense_min_ + dense_size) {
-        auto& queue = high_.at(price);
-        const OrderId id = queue.front().id;
+    const uint32_t index = level->pop_front(pool_);
 
-        queue.pop_front();
-        orders_.erase(id);
+    const OrderId id = pool_[index].order.id;
 
-        if (queue.empty()) {
-            high_.erase(price);
-        }
+    orders_[id] = OrderPool::INVALID;
+    pool_.release(index);
 
-        return;
-    }
+    if (!level->empty()) return;
 
-    size_t idx = price - dense_min_;
-    assert(!dense_[idx].empty());
+    // PriceLevel is now empty, update bitmaps
+    if (dense) {
+        const size_t idx = price - dense_min_;
+        const size_t word = idx / word_size;
+        const size_t bit = idx % word_size;
 
-    auto& queue = dense_[idx];
-    const OrderId id = queue.front().id;
-
-    queue.pop_front();
-    orders_.erase(id);
-
-    if (dense_[idx].empty()) {
-        // Indicate that this price level is empty
-        size_t word = idx / word_size;
-        size_t bit = idx % word_size;
         occupied_[word] &= ~(uint64_t{1} << bit);
 
         if (occupied_[word] == 0) {
             occupied_words_ &= ~(uint64_t{1} << word);
         }
+    } else if (price < dense_min_) {
+        low_.erase(price);
+    } else {
+        high_.erase(price);
     }
 }
 
@@ -180,44 +185,52 @@ template <Side side>
 bool
 PriceLevels<side>::erase(const OrderId id)
 {
-    const auto map_it = orders_.find(id);
-    if (map_it == orders_.end()) return false;
+    const auto index = orders_.at(id);
+    if (index == OrderPool::INVALID) return false;
 
-    const auto& [price, list_it] = map_it->second;
+    const Price price = pool_[index].price;
+
+    PriceLevel* level;
+    bool dense = false;
 
     if (price < dense_min_) {
-        auto& queue = low_.at(price);
-        queue.erase(list_it);
-
-        if (queue.empty()) {
-            low_.erase(price);
-        }
+        level = &low_.at(price);
 
     } else if (price >= dense_min_ + dense_size) {
-        auto& queue = high_.at(price);
-        queue.erase(list_it);
-
-        if (queue.empty()) {
-            high_.erase(price);
-        }
+        level = &high_.at(price);
 
     } else {
-        size_t idx = price - dense_min_;
-        dense_[idx].erase(list_it);
-        if (dense_[idx].empty()) {
-            size_t word = idx / word_size;
-            size_t bit = idx % word_size;
+        const size_t idx = price - dense_min_;
+        level = &dense_[idx];
+        dense = true;
+    }
 
-            occupied_[word] &= ~(uint64_t{1} << bit);
+    level->erase(pool_, index);
 
-            if (occupied_[word] == 0) {
-                occupied_words_ &= ~(uint64_t{1} << word);
-            }
+    orders_[index] = OrderPool::INVALID;
+    pool_.release(index);
+
+    if (!level->empty()) return true;
+
+    // PriceLevel is now empty, update bitmap occupancy
+    if (dense) {
+        const size_t idx = price - dense_min_;
+        const size_t word = idx / word_size;
+        const size_t bit = idx % word_size;
+
+        occupied_[word] &= ~(uint64_t{1} << bit);
+
+        if (occupied_[word] == 0) {
+            occupied_words_ &= ~(uint64_t{1} << word);
         }
 
+    } else if (price < dense_min_) {
+        low_.erase(price);
+
+    } else {
+        high_.erase(price);
     }
-    
-    orders_.erase(map_it);
+
     return true;
 }
 

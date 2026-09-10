@@ -1,19 +1,15 @@
 #pragma once
 
 #include "order.h"
+#include "order_pool.h"
+#include "price_level.h"
 
 #include <array>
 #include <cstddef>
-#include <list>
+#include <cstdint>
 #include <map>
-#include <unordered_map>
 
 namespace havarti {
-
-struct OrderLocation {
-    Price price;
-    std::list<BookOrder>::iterator it;
-};
 
 template <Side side>
 class PriceLevels {
@@ -36,17 +32,21 @@ class PriceLevels {
     private:
         static constexpr size_t dense_size = 4096;
         static constexpr size_t word_size = sizeof(uint64_t) * 8;
-        std::array<std::list<BookOrder>, dense_size> dense_;
+
+        std::array<PriceLevel, dense_size> dense_;
         std::array<uint64_t, dense_size / word_size> occupied_;
         uint64_t occupied_words_;
         Price dense_min_;
 
         // Maps are indexed by price (ascending)
-        std::map<Price, std::list<BookOrder>> low_;
-        std::map<Price, std::list<BookOrder>> high_;
+        std::map<Price, PriceLevel> low_;
+        std::map<Price, PriceLevel> high_;
 
-        // Order lookup by ID
-        std::unordered_map<OrderId, OrderLocation> orders_;
+        // Owns all BookOrder nodes in contiguous storage
+        OrderPool pool_;
+
+        // Maps OrderId -> pool index
+        std::vector<uint32_t> orders_;
 
         bool initialized_ = false;
 };
