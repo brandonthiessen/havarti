@@ -12,9 +12,7 @@ namespace havarti {
 
 template <Side side>
 PriceLevels<side>::PriceLevels() : occupied_{}, occupied_words_{}
-{
-    orders_.reserve(100'000'000);
-}
+{}
 
 template <Side side>
 void
@@ -51,7 +49,7 @@ PriceLevels<side>::push_back(Price price, BookOrder order)
 
     level->push_back(pool_, index);
 
-    orders_[pool_[index].order.id] = index;
+    order_index_.set(pool_[index].order.id, index);
 }
 
 template <Side side>
@@ -144,7 +142,7 @@ PriceLevels<side>::pop_front(Price price)
 
     const OrderId id = pool_[index].order.id;
 
-    orders_[id] = OrderPool::INVALID;
+    order_index_.set(id, OrderPool::INVALID);
     pool_.release(index);
 
     if (!level->empty()) return;
@@ -185,7 +183,7 @@ template <Side side>
 bool
 PriceLevels<side>::erase(const OrderId id)
 {
-    const auto index = orders_.at(id);
+    const auto index = order_index_.get(id);
     if (index == OrderPool::INVALID) return false;
 
     const Price price = pool_[index].price;
@@ -207,7 +205,7 @@ PriceLevels<side>::erase(const OrderId id)
 
     level->erase(pool_, index);
 
-    orders_[index] = OrderPool::INVALID;
+    order_index_.set(id, OrderPool::INVALID);
     pool_.release(index);
 
     if (!level->empty()) return true;

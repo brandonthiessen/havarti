@@ -1,6 +1,7 @@
 #pragma once
 
 #include "order.h"
+#include "order_index.h"
 #include "order_pool.h"
 #include "price_level.h"
 
@@ -46,7 +47,7 @@ class PriceLevels {
         OrderPool pool_;
 
         // Maps OrderId -> pool index
-        std::vector<uint32_t> orders_;
+        OrderIndex order_index_;
 
         bool initialized_ = false;
 };
