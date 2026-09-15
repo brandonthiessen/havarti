@@ -29,6 +29,7 @@ OrderIndex::set(OrderId id, uint32_t value)
     auto& page = (*page_table)[(id >> PAGE_BITS) & LEVEL_MASK];
     if (!page) {
         page = std::make_unique<Page>();
+        page->fill(INVALID);
     }
 
     (*page)[id & PAGE_MASK] = value;
