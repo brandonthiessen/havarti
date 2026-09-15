@@ -4,7 +4,6 @@ add_library(havarti_bench
 
 target_link_libraries(havarti_bench
     PUBLIC
-        havarti_core
         havarti_support
 )
 

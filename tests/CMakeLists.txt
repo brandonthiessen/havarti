@@ -18,7 +18,6 @@ add_executable(havarti_tests
 
 target_link_libraries(havarti_tests
     PRIVATE
-        havarti_core
         havarti_support
         GTest::gtest_main
 )
