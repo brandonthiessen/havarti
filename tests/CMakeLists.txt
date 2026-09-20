@@ -11,6 +11,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(havarti_tests
+    test_async_trade_sink.cpp
     test_orderbook.cpp
     test_price_levels.cpp
     test_ring_buffer.cpp
