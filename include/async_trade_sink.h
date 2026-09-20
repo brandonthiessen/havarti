@@ -23,14 +23,20 @@ class AsyncTradeSink final : public TradeSink {
         ~AsyncTradeSink();
         bool submit(const Trade& trade);
 
+        void shutdown();
+
+        int get_trades_processed() const { return trades_processed_; }
+        int get_trades_dropped() const { return trades_dropped_; }
+
     private:
         void run();
-
-        int trades_processed;
 
         std::thread thread_;
         SpscRingBuffer<Trade> queue_;
         std::atomic<bool> running_{true};
+
+        int trades_processed_{0};
+        int trades_dropped_{0};
 };
 
 } // namespace havarti
