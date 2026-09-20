@@ -5,9 +5,10 @@
 namespace havarti {
 
 AsyncTradeSink::AsyncTradeSink(const size_t queue_capacity):
-    queue_(queue_capacity),
-    thread_(&AsyncTradeSink::run, this)
-{}
+    queue_(queue_capacity)
+{
+    thread_ = std::thread(&AsyncTradeSink::run, this);
+}
 
 AsyncTradeSink::~AsyncTradeSink()
 {
