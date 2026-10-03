@@ -69,9 +69,9 @@ Benchmarks were run on Apple Silicon using a native optimized build (`-O3 -mcpu=
 
 | Metric      |               Result |
 | ----------- | -------------------: |
-| Throughput  | **36.0M orders/sec** |
-| p50 latency |            **32 ns** |
-| p99 latency |            **58 ns** |
+| Throughput  | **41.0M orders/sec** |
+| p50 latency |            **22 ns** |
+| p99 latency |            **47 ns** |
 
 The latency benchmark processes orders in batches of 100 and reports the average processing time per order for each batch. Batching is used because the effective clock granularity on the test system was too coarse to reliably measure individual orders at nanosecond-scale latencies. The latency benchmark also reports p99.9 and p99.99 percentiles and trade-count statistics per order.
 
