@@ -6,14 +6,14 @@ namespace havarti {
 
 TEST(RingBufferTest, IsEmptyInitially)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     EXPECT_TRUE(buffer.empty());
 }
 
 TEST(RingBufferTest, PushThenPop)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     EXPECT_TRUE(buffer.try_push(42));
 
@@ -24,7 +24,7 @@ TEST(RingBufferTest, PushThenPop)
 
 TEST(RingBufferTest, PopOnEmptyBufferReturnsFalse)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     int value;
     EXPECT_FALSE(buffer.try_pop(value));
@@ -32,7 +32,7 @@ TEST(RingBufferTest, PopOnEmptyBufferReturnsFalse)
 
 TEST(RingBufferTest, MaintainsFifoOrder)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     ASSERT_TRUE(buffer.try_push(1));
     ASSERT_TRUE(buffer.try_push(2));
@@ -54,7 +54,7 @@ TEST(RingBufferTest, MaintainsFifoOrder)
 
 TEST(RingBufferTest, PeekReturnsFrontWithoutRemoving)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     ASSERT_TRUE(buffer.try_push(42));
 
@@ -71,7 +71,7 @@ TEST(RingBufferTest, PeekReturnsFrontWithoutRemoving)
 
 TEST(RingBufferTest, CapacityIsOneLessThanBufferSize)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     EXPECT_TRUE(buffer.try_push(1));
     EXPECT_TRUE(buffer.try_push(2));
@@ -81,7 +81,7 @@ TEST(RingBufferTest, CapacityIsOneLessThanBufferSize)
 
 TEST(RingBufferTest, PushSucceedsAfterPopFromFullBuffer)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     ASSERT_TRUE(buffer.try_push(1));
     ASSERT_TRUE(buffer.try_push(2));
@@ -108,7 +108,7 @@ TEST(RingBufferTest, PushSucceedsAfterPopFromFullBuffer)
 
 TEST(RingBufferTest, HandlesWraparound)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     for (int i = 0; i < 100; ++i) {
         ASSERT_TRUE(buffer.try_push(i));
@@ -123,7 +123,7 @@ TEST(RingBufferTest, HandlesWraparound)
 
 TEST(RingBufferTest, PeekOnEmptyBufferReturnsFalse)
 {
-    SpscRingBuffer<int> buffer(4);
+    SpscRingBuffer<int, 4> buffer;
 
     int value;
     EXPECT_FALSE(buffer.try_peek(value));
@@ -131,7 +131,7 @@ TEST(RingBufferTest, PeekOnEmptyBufferReturnsFalse)
 
 TEST(RingBufferTest, CapacityOneCannotStoreElements)
 {
-    SpscRingBuffer<int> buffer(1);
+    SpscRingBuffer<int, 1> buffer;
 
     EXPECT_TRUE(buffer.empty());
     EXPECT_FALSE(buffer.try_push(42));

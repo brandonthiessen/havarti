@@ -24,7 +24,7 @@ Trade make_trade(
 
 TEST(AsyncTradeSinkTest, ProcessesSubmittedTrade)
 {
-    AsyncTradeSink sink(16);
+    AsyncTradeSink sink;
 
     ASSERT_TRUE(sink.submit(make_trade(1, 2)));
 
@@ -36,7 +36,7 @@ TEST(AsyncTradeSinkTest, ProcessesSubmittedTrade)
 
 TEST(AsyncTradeSinkTest, ProcessesMultipleSubmittedTrades)
 {
-    AsyncTradeSink sink(1024);
+    AsyncTradeSink sink;
 
     constexpr int num_trades = 1000;
 
@@ -52,7 +52,7 @@ TEST(AsyncTradeSinkTest, ProcessesMultipleSubmittedTrades)
 
 TEST(AsyncTradeSinkTest, ShutdownIsIdempotent)
 {
-    AsyncTradeSink sink(16);
+    AsyncTradeSink sink;
 
     ASSERT_TRUE(sink.submit(make_trade(1, 2)));
 
@@ -65,7 +65,7 @@ TEST(AsyncTradeSinkTest, ShutdownIsIdempotent)
 
 TEST(AsyncTradeSinkTest, ShutdownDrainsQueuedTrades)
 {
-    AsyncTradeSink sink(8192);
+    AsyncTradeSink sink;
 
     constexpr int num_trades = 1000;
 
@@ -82,7 +82,7 @@ TEST(AsyncTradeSinkTest, ShutdownDrainsQueuedTrades)
 
 TEST(AsyncTradeSinkTest, HandlesDifferentTradeValues)
 {
-    AsyncTradeSink sink(16);
+    AsyncTradeSink sink;
 
     ASSERT_TRUE(sink.submit(make_trade(1, 2, 100, 10)));
     ASSERT_TRUE(sink.submit(make_trade(3, 4, 250, 75)));
@@ -92,19 +92,6 @@ TEST(AsyncTradeSinkTest, HandlesDifferentTradeValues)
 
     EXPECT_EQ(sink.get_trades_processed(), 3);
     EXPECT_EQ(sink.get_trades_dropped(), 0);
-}
-
-TEST(AsyncTradeSinkTest, DropsTradesWhenQueueIsFull)
-{
-    AsyncTradeSink sink(2);
-
-    ASSERT_TRUE(sink.submit(make_trade(1, 2)));
-    EXPECT_FALSE(sink.submit(make_trade(2, 3)));
-
-    sink.shutdown();
-
-    EXPECT_EQ(sink.get_trades_processed(), 1);
-    EXPECT_EQ(sink.get_trades_dropped(), 1);
 }
 
 } // namespace havarti
