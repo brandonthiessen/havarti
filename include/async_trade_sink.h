@@ -12,7 +12,7 @@ namespace havarti {
 
 class AsyncTradeSink final : public TradeSink {
     public:
-        explicit AsyncTradeSink(const size_t queue_capacity);
+        explicit AsyncTradeSink();
 
         // AsyncTradeSink represents a communication channel and cannot be copied or moved.
         AsyncTradeSink(const AsyncTradeSink&) = delete;
@@ -31,8 +31,11 @@ class AsyncTradeSink final : public TradeSink {
     private:
         void run();
 
+        // Must be a power of 2.
+        static constexpr size_t QUEUE_CAPACITY = 8192;
+        SpscRingBuffer<Trade, QUEUE_CAPACITY> queue_;
+
         std::thread thread_;
-        SpscRingBuffer<Trade> queue_;
         std::atomic<bool> running_{true};
 
         int trades_processed_{0};

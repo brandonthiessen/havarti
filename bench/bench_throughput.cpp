@@ -8,7 +8,7 @@ namespace havarti::bench {
 BenchData bench_throughput() {
     BenchData d;
 
-    havarti::AsyncTradeSink sink(8192);
+    havarti::AsyncTradeSink sink;
     havarti::OrderBook book(sink);
     havarti::support::OrderGenerator gen{42};
 

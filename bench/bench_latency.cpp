@@ -15,7 +15,7 @@ BenchData bench_latency()
     constexpr size_t N = 10'000'000;
     constexpr size_t BATCH_SIZE = 100;
 
-    havarti::AsyncTradeSink sink(8192);
+    havarti::AsyncTradeSink sink;
     havarti::OrderBook book(sink);
     havarti::support::OrderGenerator gen{42};
 

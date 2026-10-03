@@ -8,7 +8,7 @@ namespace havarti::bench {
 BenchData bench_one_sided_pressure() {
     BenchData d;
 
-    havarti::AsyncTradeSink sink(8192);
+    havarti::AsyncTradeSink sink;
     havarti::OrderBook book(sink);
 
     // Generate orders biased 70:30 buys:sells
