@@ -7,10 +7,14 @@
 namespace havarti {
 
 // A single-producer, single-consumer ring buffer
-// Note: actual usable number of entries is `capacity - 1`.
-template <typename T>
+// The buffer has Capacity slots, of which Capacity - 1 are usable.
+template <typename T, size_t Capacity>
 struct SpscRingBuffer {
-    explicit SpscRingBuffer(size_t capacity);
+    // Queue capacity must be a power of 2.
+    static_assert(Capacity > 0);
+    static_assert((Capacity & (Capacity - 1)) == 0);
+
+    SpscRingBuffer();
     ~SpscRingBuffer();
 
     // SPSC ring buffer represents a communication channel and cannot be copied or moved.
@@ -24,31 +28,28 @@ struct SpscRingBuffer {
     bool try_peek(T& out);
     bool empty() const;
 
-    const size_t capacity_;
-    std::atomic<size_t> head_{0};
-    std::atomic<size_t> tail_{0};
+    alignas(64) std::atomic<size_t> head_{0};
+    alignas(64) std::atomic<size_t> tail_{0};
     T* buffer_{nullptr};
 };
 
-template <typename T>
-SpscRingBuffer<T>::SpscRingBuffer(size_t capacity):
-    capacity_(capacity)
+template <typename T, size_t Capacity>
+SpscRingBuffer<T, Capacity>::SpscRingBuffer()
 {
-    assert(capacity_ > 0);
-    buffer_ = new T[capacity_];
+    buffer_ = new T[Capacity];
 }
 
-template <typename T>
-SpscRingBuffer<T>::~SpscRingBuffer() {
+template <typename T, size_t Capacity>
+SpscRingBuffer<T, Capacity>::~SpscRingBuffer() {
     delete[] buffer_;
 }
 
-template <typename T>
+template <typename T, size_t Capacity>
 bool
-SpscRingBuffer<T>::try_push(const T& value)
+SpscRingBuffer<T, Capacity>::try_push(const T& value)
 {
     size_t head = head_.load(std::memory_order_relaxed);
-    size_t next = (head + 1) % capacity_;
+    size_t next = (head + 1) & (Capacity - 1);
 
     // Check if buffer is full
     if (next == tail_.load(std::memory_order_acquire)) {
@@ -60,9 +61,9 @@ SpscRingBuffer<T>::try_push(const T& value)
     return true;
 }
 
-template <typename T>
+template <typename T, size_t Capacity>
 bool
-SpscRingBuffer<T>::try_pop(T& out)
+SpscRingBuffer<T, Capacity>::try_pop(T& out)
 {
     size_t tail = tail_.load(std::memory_order_relaxed);
 
@@ -72,13 +73,13 @@ SpscRingBuffer<T>::try_pop(T& out)
     }
 
     out = buffer_[tail];
-    tail_.store((tail + 1) % capacity_, std::memory_order_release);
+    tail_.store((tail + 1) & (Capacity - 1), std::memory_order_release);
     return true;
 }
 
-template <typename T>
+template <typename T, size_t Capacity>
 bool
-SpscRingBuffer<T>::try_peek(T& out)
+SpscRingBuffer<T, Capacity>::try_peek(T& out)
 {
     size_t tail = tail_.load(std::memory_order_relaxed);
 
@@ -91,9 +92,9 @@ SpscRingBuffer<T>::try_peek(T& out)
     return true;
 }
 
-template <typename T>
+template <typename T, size_t Capacity>
 bool
-SpscRingBuffer<T>::empty() const
+SpscRingBuffer<T, Capacity>::empty() const
 {
     size_t tail = tail_.load(std::memory_order_relaxed);
     size_t head = head_.load(std::memory_order_relaxed);
