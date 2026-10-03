@@ -23,6 +23,7 @@ target_include_directories(havarti_core PUBLIC include)
 
 add_library(havarti_support
     support/mock_trade_sink.cpp
+    support/null_trade_sink.cpp
     support/order_generator.cpp
 )
 
