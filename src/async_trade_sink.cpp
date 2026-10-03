@@ -15,7 +15,8 @@ AsyncTradeSink::~AsyncTradeSink()
 }
 
 bool
-AsyncTradeSink::submit(const Trade& trade) {
+AsyncTradeSink::submit(const Trade& trade)
+{
     if (!queue_.try_push(trade)) {
         trades_dropped_++;
         return false;
@@ -35,7 +36,8 @@ AsyncTradeSink::shutdown()
 }
 
 void
-AsyncTradeSink::run() {
+AsyncTradeSink::run()
+{
     while (running_.load(std::memory_order_relaxed)) {
         Trade trade;
         while (queue_.try_pop(trade)) {
