@@ -4,10 +4,13 @@ project(havarti)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS_RELEASENATIVE "-O3 -mcpu=native")
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+
+set(CMAKE_CXX_FLAGS_RELEASENATIVE "-O3 -mcpu=native -DNDEBUG")
 
 add_compile_options(
     $<$<CONFIG:Release>:-O3>
+    $<$<CONFIG:Release>:-DNDEBUG>
 )
 
 add_library(havarti_core
