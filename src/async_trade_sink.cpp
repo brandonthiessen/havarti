@@ -38,8 +38,8 @@ AsyncTradeSink::shutdown()
 void
 AsyncTradeSink::run()
 {
+    Trade trade;
     while (running_.load(std::memory_order_relaxed)) {
-        Trade trade;
         while (queue_.try_pop(trade)) {
             // TODO: properly handle trades
             trades_processed_++;
@@ -47,7 +47,6 @@ AsyncTradeSink::run()
     }
 
     // Drain anything submitted before shutdown
-    Trade trade;
     while (queue_.try_pop(trade)) {
         trades_processed_++;
     }
