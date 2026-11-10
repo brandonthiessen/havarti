@@ -23,8 +23,9 @@ esac
 
 cmake -S . -B "$BUILD_DIR" \
     -DCMAKE_BUILD_TYPE="$CMAKE_CONFIG" \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -G Ninja
 
 ln -sf "$BUILD_DIR/compile_commands.json" compile_commands.json
 
-cmake --build "$BUILD_DIR" --parallel
+cmake --build "$BUILD_DIR"
